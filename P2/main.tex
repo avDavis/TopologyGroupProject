@@ -1,3 +1,4 @@
+
 \documentclass[11pt]{article}
 % \usepackage[margin=1in]{geometry}
 \usepackage{enumerate}
@@ -8,6 +9,8 @@
 \usepackage{amssymb}
 \usepackage{gensymb}
 \usepackage{hyperref}
+\usepackage{floatrow}
+\floatsetup[table]{capposition=top}
 
 %opening
 \title{CSCI 491/591 P2}
@@ -19,13 +22,12 @@ Angelica Davis, Peng Zou}
 
 \maketitle
 \noindent
-In the deliverable, we selected an interesting data set
-that we will investigate in the project.  The data set is GPS trajectories. We will explain where the data is
-from,  what  the  data  means,  and  conjecture  what  we  might  find  in  this
-project.
-\section*{Data Set Choice}
-The data set being explored is a compilation of GPS trajectories extracted from the files discussed in P1. \\
-In P1, we went through all data sets provided by Map Construction Portal and we decided to investigate trajectory data of the tracks in Berlin, large. It is a suitable representative data set because the size of trajectory data is about midway between Chicago and Athens. The data set size is a suitably comparable characteristic since the data sets represent overlapping trajectories as well as noisy trajectories. Thus, a mid-sized data set may well represent the noise ratio (either due to noisy trajectories or sampling uniformity).
+We selected an interesting data set among several data sets
+that we would like to explore in the project. The data set is one of the GPS trajectories. We will provide the information where the data set is from and explain the meanings of data. We will also conjecture what we might find in this project based on the exploration of the data set.
+\section*{Data Set We Chose}
+The data set being explored is the GPS trajectories of the city, Berlin. \\
+%In P1, we went through all data sets provided by Map Construction Portal and we decided to investigate trajectory data of the tracks in Berlin, large. 
+It is a suitable representative data set because the size of the trajectory data is about midway between Chicago and Athens. The size of data set is a suitably comparable characteristic since the data sets represent overlapping trajectories as well as noisy trajectories. Thus, a mid-sized data set may well represent the noise ratio (either due to noisy trajectories or sampling uniformity).
 % Data set choice (8 points). You must select an interesting data set
 % that you will investigate in this project. The data set can be real (GPS trajectories,
 % Four-square check-ins, gene expressions, March madness brackets,
@@ -33,7 +35,9 @@ In P1, we went through all data sets provided by Map Construction Portal and we 
 % (flip graphs, the space of image patches, etc.). [Deliverable: one-to-two page write-up].
 
 \section*{Details About the Data}
-The original data set files were downloaded from the Map Construction Portal with the website url as \url{http://www.mapconstruction.org/data_downloads/}.  The downloaded data set includes the tracking data of Berlin city. The data set has 27,189 trips (a trip is a collection of GPS trajectories for one trip over some time period) in .txt format. Each trip has three column numbers, and each column corresponds to x-coordinate, y-coordinate and time stamp corresponding to the x,y-coordinate. The following Table \ref{table:questions} will provide a brief description of the tracking data of Berlin city.
+The GPS trajectories of Berlin was downloaded from the Map Construction Portal(\url{http://www.mapconstruction.org/data_downloads/}).  \\
+The GPS trajectories of Berlin contain the trajectory data of trips in Berlin. Here the trip is a collection of GPS trajectories for one trip over some time period. The trajectory data has more than 27,000 trips in .txt format. \\
+Each trip file consists trajectory data of x-coordinate, y-coordinate and time stamp corresponding to the x, y-coordinate. Table \ref{table:questions} provides a sample of a trip file partially of the trajectory data of Berlin.
 % Explain where the data is
 % from, what the data means,
 % TODO: write something here.\\
@@ -42,9 +46,9 @@ The original data set files were downloaded from the Map Construction Portal wit
 % \end{center}
 \begin{table}
 \begin{center}
-\begin{tabular}{ |l |c| r| }
+\begin{tabular}{ |c |c| r| }
 \hline
-  x-coordinate & y-coordinate & time stamp   \\ \hline
+  x & y & Time stamp   \\ \hline
   393742.586772 & 5821049.184616 & 2585542.00   \\ \hline
   393747.949682 & 5821296.284551 & 2585604.00 \\  \hline
   393883.091662 & 5821448.203015 & 2585677.00  \\ \hline
@@ -52,29 +56,40 @@ The original data set files were downloaded from the Map Construction Portal wit
   \vdots & \vdots & \vdots \\ \hline
 \end{tabular}
 \end{center}
-\caption{Excerpt of track data of Berlin large in trip1}
+\caption{An excerpt of trajectory data of Berlin in a trip file}
 \label{table:questions}
 \end{table}
 
-\begin{figure}[h!]
-  \caption{A tracking map after processing the track Berlin large data set}
-  \centering
- \includegraphics[scale=0.8]{p1.eps} 
-\end{figure}
+%\begin{figure}[h!]
+ % \caption{A tracking map after processing the track Berlin large data set}
+ % \centering
+% \includegraphics[scale=0.8]{p1.eps} 
+%\end{figure}
 
 \pagebreak
-\section*{Conjectures}
+\section*{What We Might Find}
+We might find out that the trajectory data we chose does not produce any map without using the techniques we mentioned in the previous deliverable. We might come up with a road map of Berlin base on the trajectory data we chose after using the techniques. We might find some new technique by exploring the GPS trajectories data. 
 
-Explain where the data is
-from, what the data means, and  {\em conjecture what you might find in this
-project}.
 
-\section*{Discussion}
-In P2, we had discussion on the analysis of the data. We came up with two data files from the original trip files. \\
-It is usually nice to conclude any write-up.\\
+% \section*{Discussion}
+% In P2, we had discussion on the analysis of the data. We came up with two data files from the original trip files. \\
+% It is usually nice to conclude any write-up.\\
 
-pts.txt: grid points after the city, 
-manifold value: clr.txt
+% pts.txt: grid points after the city, 
+% manifold value: clr.txt
 \section*{Conclusion}
-
+% \\
+% 1. Using a. b. c. ... as section numbers is not really standard, and looks a little funny to me.  Perhaps just stick with the standard Section Name (maybe you were using an enumeration instead)?{\bfseries FIXED}\\ 
+% Use capital letters to start a sentence (e.g., "the description of map data ..."){\bfseries FIXED}\\
+% This deliverable was expected to be a bit more narrative in nature.  As it is written, it is closer to an outline than a write-up.\\
+% For vertex data: what are the coordinates?  lat/lon or x/y (if lat/lon, you will need to use a local projection to the plane ...)\\
+% 'track data' $\rightarrow$ 'trajectory data'\\
+%  Captions for tables should always go above the table (for figures, it always goes below the figure).  See this reference: The Elements of Typographic Style){\bfseries FIXED}\\
+% While HZ02 is one of the first references on persistence, also take a look at the survey paper: https://users.cs.duke.edu/~edels/Papers/2008-B-02-PersistentHomology.pdf\\
+% c.1 and d.1: Persistent is an adjective, so either write "persistent homology" or "persistence" \\
+% discrete Morse theory differs from Morse theory in that we no longer require differentiable functions.\\
+% Perhaps a description of what is done in [SL15] would be in order.
+% Your biblio entries are a little off.  Please check your .bib file (if you don't see why ... send me your .bib file and I can take a look for you).\\
+% Are you assuming a manifold somewhere?  I ask because you talk about manifolds ...{\bfseries NA}\\
+% Be sure to have your group number in your project deliverables.{\bfseries FIXED}\\
 \end{document}
