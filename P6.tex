@@ -97,7 +97,7 @@ Each trip file consists of a list of trajectory data represented by an x-coordin
 \begin{figure}[H]
   \caption{A visualization of discretely sampled points of the trajectory data of Berlin, as they are collected by taxi drivers' GPS systems. The points are actually physically far apart. We set the scale to $10^5$ for $x$ axis and $10^6$ for $y$ axis, which enable us to see the big picture of the points with the scale.}
   \centering
-% \includegraphics[scale=0.5]{RawVerticesCircle.eps} 
+ \includegraphics[scale=0.5]{RawVerticesCircle.eps} 
 \end{figure}
 
 \section*{Steps to Reconstruct the Map}
@@ -132,13 +132,13 @@ In map reconstruction, the first step is density calculation.  In P2,  we gave t
     \centering
     \begin{subfigure}[t]{0.5\textwidth}
         \centering
-%        \includegraphics[height=2.9in]{densityMapAerialfig.eps}
+        \includegraphics[height=2.9in]{densityMapAerialfig.eps}
         \caption{The visualization of the density field in two-dimension.}
     \end{subfigure}%
     ~
     \begin{subfigure}[t]{0.5\textwidth}
         \centering
-%        \includegraphics[height=2.9in]{densityMap.eps}
+        \includegraphics[height=2.9in]{densityMap.eps}
         \caption{The visualization of the density field in three-dimension.}
     \end{subfigure}
     \caption{The figure demonstrates the density distribution of trajectories. It is the visualization of the density field after calculation, the very high density regions are colored in green or blue, the high level density regions are colored in red, and the low density regions are colored in dark red. The underlying main road networks are much clearer based on the density field map.}
@@ -154,14 +154,14 @@ Figure $3$ shows the map obtained by extracting the ridge (we use a little extra
  \begin{figure}[H]
   \caption{The map is obtained by extracting the ridge of density terrain and projecting it in the plane. The underlying road network begins to emerge.}
   \centering 
-% \includegraphics[scale=0.6]{ex1.eps} 
+ \includegraphics[scale=0.6]{ex1.eps} 
 \end{figure}
 
 \subsection*{Persistence Simplification}
 \begin{figure}[h!]
   \caption{The simplification of the map by removing all unimportant roads whose persistence are not greater than a threshold of 0.5. The main roads in the city are displayed.} 
   \centering
-% \includegraphics[scale=0.6]{p1.eps} 
+ \includegraphics[scale=0.6]{p1.eps} 
 \end{figure}
 We compute the persistence~\cite{edelsbrunner2008persistent} for each road, and remove all unimportant roads whose persistence are not greater than a given value. By applying persistence filtration based on the estimated density, we obtain a simplified road network estimation. Since the previous step of ridge extraction identifies the regions of highest confidence, this simplification step acts to filter out the regions of lowest confidence. Figure $4$ shows the important roads after simplification. It also shows the connectivity of the map is decreased after simplification. Our group will further improve the performance of simplification.
 \section*{Conclusion and Future Work}
