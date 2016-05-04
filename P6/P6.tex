@@ -1,0 +1,191 @@
+\documentclass[11pt]{article}
+% \usepackage[margin=1in]{geometry}
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{0.5\baselineskip}{0.4\baselineskip}
+\usepackage{enumerate}
+\usepackage{verbatim}
+\usepackage{cite}
+\usepackage{forest}
+\usepackage[margin=1in]{geometry}
+\usepackage{mathtools,amsmath,amssymb, gensymb}
+\usepackage{hyperref}
+\usepackage{floatrow, subcaption, caption, float}
+\restylefloat*{figure}
+\floatsetup[table]{capposition=top}
+\usepackage{filecontents}
+\usepackage[T1]{fontenc}
+% for proper encoding
+\usepackage[utf8]{inputenc}
+% enhanced font Latin Modern
+\usepackage{lmodern}
+% multi-language support
+\usepackage[english]{babel}
+% for inline and display quotations.
+\usepackage[autostyle]{csquotes}
+\usepackage{url}
+% set the default 4 inches margin to be 1 inch
+\usepackage{fullpage}
+\setlength{\parskip}{0.5em}
+\renewcommand{\baselinestretch}{1}
+
+\title{CSCI 491/591 P6}
+\date{April 28, 2016}
+\author{Group 4\\Chenglin Fan, Jici Huang,
+Angelica Davis, and Peng Zou}
+\begin{document}
+\maketitle
+\vspace{-0.4 in}
+%P3: Data visualization (20 points). Now that you have chosen a data
+%set, part of research in data analysis is presenting the data in a way that
+%is understandable to a reader (or reviewer). This is best done through
+%figures that capture essential features of your data set. These figures can
+%be projections of the data set into the plane, histograms measuring some
+%quantity computed over your data, a figure illustrating from where your
+%data was sampled, etc. [Deliverable: five figures, with captions and labels].\\
+\noindent
+
+
+  In this project our group is exploring a data sets comprised of GPS trajectories collected from taxi `trips' around various major cities across the globe, such as Athens in Greece, Berlin in Germany, Chicago in US, and Beijing in China. In the award winning paper, ``Efficient Map Reconstruction and Augmentation via Topological Methods''~\cite{Wang15}, the GPS trajectories of major cities were processed using two critical topological concepts, persistence~\cite{edelsbrunner2008persistent} and Morse Theory~\cite{milnor1963morse}, in order to construct an accurate image of the road networks of these major cities. The ultimate goal of our project is to deeply understand the topological concepts and techniques used in the paper to analyze GPS trajectories, and to add these data processing techniques to our skill sets, since they have been shown to be effective against a variety of noise that are common to  practical and experimental data.
+  \par Our group selected the GPS trajectories data set of Berlin, among several others that we have explored in the project. The Data Set Selection section provides information on where the data set is from, and several reasons why the particular data set was selected. 
+  
+  
+In the second part, we show the  several steps in the map reconstruction process, which includes the pre-processing of trajectory data, the density field calculation, ridge extraction, and  simplification of the road network.
+Then, we illustrate the visualization of results we got in this project, including the  visualization of trajectory data, the resulting map from extracting the ridge of the terrain,   and the map after persistence simplification.
+Finally, we give the conclusion, and possible improvements to work on in the future.
+
+\section*{Data Set Selection}
+\par
+In recent years, the amount of Volunteered Geographic Information (VGI) data that is publicly available has grown very fast, and the computational map construction from these GPS trajectories has attracted great attention.~\cite{Wang15} The data set selected for this project was the VGI trajectory data of Berlin, Germany. The items below discuss why the Berlin trajectory data set was chosen.
+\par
+First, GPS trajectory information has many very practical uses, therefore there is much value in knowing how to process and analyze data sets of this type. 
+\par
+Second, VGI data sets tend to be massive in size. The data set selected for Berlin contains a moderate number of trips and GPS samples per trip when compared to data sets of other cities. This makes it a good candidate for efficient processing given the time constraint, since the input data set size has a significant impact on the running time of the algorithm. Additionally, it contains enough densely overlapping trip data for the algorithm to produce a road network estimation with a degree of confidence (this will be explained more thoroughly in the steps section).
+\par
+Third, the data sets are all open source. The data set is accessible via the Internet, and can be downloaded from the open source website conveniently~\cite{link}, and many researchers~\cite{Wang15} use this data for research, hence it is easy to compare between the results of our experiment and the results of other people's work.
+%\par
+%Last but not least, the quality of the data sets are guaranteed. The data set has a comparable characteristic since the data set contains overlapping trajectories as well as noisy trajectories (either due to noisy trajectories or lack of sampling uniformity).  % This doesn't really make any sense
+% Data set choice (8 points). You must select an interesting data set
+% that you will investigate in this project. The data set can be real (GPS trajectories,
+% Four-square check-ins, gene expressions, March madness brackets,
+% baseball statistics, 3D objects, movie scripts, etc.), or it can be theoretical
+% (flip graphs, the space of image patches, etc.). [Deliverable: one-to-two page write-up].
+
+\section*{Details of the Data}
+\par
+The data set of Berlin GPS trajectories was downloaded from the Map Construction Portal~\cite{link}. The GPS trajectories of Berlin contain the trajectory data of taxi trips in Berlin. A trip is a collection of discretely sampled GPS trajectories that describe one path traveled through the city over some time period. The trajectory data has more than 27,000 trips in .txt format. 
+\par
+Each trip file consists of a list of trajectory data represented by an x-coordinate, y-coordinate and time stamp. Table \ref{table:questions} provides a partial sample of a trip file taken from the trajectory data of Berlin.
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{ |c |c| c| }
+\hline
+  time-stamp & x & y    \\ \hline
+  2585542.00 & 393742.586772 & 5821049.184616    \\ \hline
+  2585604.00 & 393747.949682 & 5821296.284551  \\  \hline
+  2585677.00 & 393883.091662 & 5821448.203015  \\ \hline
+  2585738.00 & 393759.343945 & 5821821.259046  \\ \hline
+\end{tabular}
+\end{center}
+\caption{An excerpt of trajectory data of Berlin}
+\label{table:questions}
+\end{table}
+
+
+
+
+
+\begin{figure}[H]
+  \caption{A visualization of discretely sampled points of the trajectory data of Berlin, as they are collected by taxi drivers' GPS systems. The points are actually physically far apart. We set the scale to $10^5$ for $x$ axis and $10^6$ for $y$ axis, which enable us to see the big picture of the points with the scale.}
+  \centering
+ \includegraphics[scale=0.5]{RawVerticesCircle.eps} 
+\end{figure}
+
+\section*{Steps to Reconstruct the Map}
+\par
+Our group uses the map reconstruction algorithm~\cite{Wang15} to estimate the Road Network, which includes converting input trajectories to a density map, and  extracting the ridge of the 
+density map; the  steps are as follows.   
+
+\par
+ \textbf{Density Field Construction:} Discretize the region of city into a
+grid where each grid cell has side-length $r$. Each input trajectories is a sequence of discrete  sampled points,  let P = $\{p_1,p_2,p_3,...,p_n\}$ be the collection of discrete sampled points
+from the trajectories. Compute the density $\rho(g)$ for  each grid point $g$ ($g_x,g_y$) based on the density function in paper~\cite{Wang15}.
+\par
+\textbf{Ridge Extraction:} The set of points $\{(g_x,g_y,\rho(g)) \}$ in $\mathbb{R}^3$ is a discrete terrain, compute the saddle points in the terrain, where saddle point of terrain is a stationary point but not an extreme point. Then we compute the 
+manifold $S(p)$ for each saddle point $p$, where $S(p)$  is the collection
+of points of the terrain such that for each point $q$ in $S(p)$, there is a  monotone  descending path from $q$ to $p$, and $S(p)$ is usually composed of  discrete curves (each of them is from a local maximum point to $p$ ).
+\par
+\textbf{Persistence Simplification:} The persistence is used to measure the scale or
+resolution of a topological feature. Compute the persistence~\cite{edelsbrunner2008persistent} for each manifold $S(p)$ (whose projection is a piece of  road), the persistence value is equal the difference between the density of  local maximal point and the density of saddle point. We remove all the  manifolds
+(unimportant roads) whose persistence is smaller than a given value. At last we project the remaining manifolds onto the plane, and obtain the road network of city.
+
+
+
+\section*{Experimental Results}
+
+
+\subsection*{Trajectory Data  Visualization}
+Each trip of the trajectory data is composed of a series of discrete points. Figure $1$ shows the discrete points of the trips in Berlin. We can barely figure out the main roads from the spread out points in Figure $1$, nor in the map of the city. In Figure $1$, some regions have higher density of the discrete points while other parts have lower density of the discrete points. But even the higher density regions are not connected to each other, it is impossible to get the map of the city directly without further processing. 
+\subsection*{Density Field Visualization}
+In map reconstruction, the first step is density calculation.  In P2,  we gave the details to compute the density $\rho(g)$ for each grid point $g$ based on the density function~\cite{Wang15}. We set the grid size be $10m$, and the parameter $t$ (an input variable that roughly indicates the noise level) be $\sqrt{t}=20 m$ \begin{comment} we should not include this unless we can say how we know what to approximate the noise as!!!!!!!!\end{comment}. Figure $2$ is the visualization of the density field after calculation, the very high density regions are colored in green or blue, the high level density regions are colored in red, and the low density regions are colored in dark red. The underlying main road networks are much clearer based on the density field map. 
+
+\begin{figure*}[t!]
+    \centering
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=2.9in]{densityMapAerialfig.eps}
+        \caption{The visualization of the density field in two-dimension.}
+    \end{subfigure}%
+    ~
+    \begin{subfigure}[t]{0.5\textwidth}
+        \centering
+        \includegraphics[height=2.9in]{densityMap.eps}
+        \caption{The visualization of the density field in three-dimension.}
+    \end{subfigure}
+    \caption{The figure demonstrates the density distribution of trajectories. It is the visualization of the density field after calculation, the very high density regions are colored in green or blue, the high level density regions are colored in red, and the low density regions are colored in dark red. The underlying main road networks are much clearer based on the density field map.}
+\end{figure*}
+
+\subsection*{Ridge Extraction}
+The details of ridge extraction is given in P$2$. The motivation of ridge extraction is to obtain the skeleton of the map for the following reasons.\\
+First, even the high density regions in density filed map have multiplicities that span a wider region than the singular, ground truth network of city. Hence, the direct use of high density regions is not suitable to obtain the map. Second, ridge extraction
+can detect roads with few trajectories passing them even when they
+are next to heavily populated roads, which would otherwise be easy to eliminate as noise, introducing unwanted gaps in the resulting road network. Last but not least, it is convenient for further simplification on the map later. Since the 'ridge' is found by calculating the maximum, that is critical, points given the distribution of overlapping trajectories on the z-axis, this maximal curve also corresponds to the most confident estimation of the underlying road. 
+
+Figure $3$ shows the map obtained by extracting the ridge (we use a little extra operation to add the connection in the junction \begin{comment} WHY? \end{comment}).
+ \begin{figure}[H]
+  \caption{The map is obtained by extracting the ridge of density terrain and projecting it in the plane. The underlying road network begins to emerge.}
+  \centering 
+ \includegraphics[scale=0.6]{ex1.eps} 
+\end{figure}
+
+\subsection*{Persistence Simplification}
+\begin{figure}[h!]
+  \caption{The simplification of the map by removing all unimportant roads whose persistence are not greater than a threshold of 0.5. The main roads in the city are displayed.} 
+  \centering
+ \includegraphics[scale=0.6]{p1.eps} 
+\end{figure}
+We compute the persistence~\cite{edelsbrunner2008persistent} for each road, and remove all unimportant roads whose persistence are not greater than a given value. By applying persistence filtration based on the estimated density, we obtain a simplified road network estimation. Since the previous step of ridge extraction identifies the regions of highest confidence, this simplification step acts to filter out the regions of lowest confidence. Figure $4$ shows the important roads after simplification. It also shows the connectivity of the map is decreased after simplification. Our group will further improve the performance of simplification.
+\section*{Conclusion and Future Work}
+%\par
+%The project that our group is working on is interesting and fascinating. All members are excited to explore the GPS data by the applications of GPS that are affecting every aspect of modern life.    We investigate the background of reconstructing data from trajectory data, and implement  the method in paper~\cite{Wang15}, and illustrate the results we got by now.
+
+
+%The  density function in paper~\cite{Wang15} can be used to efficiently deal with noise.
+Two important topological concepts used in this project are discrete morse theory and persistence.  Morse theory enables one to analyze the topology of a manifold; by extracting the ridge, we can capture the skeleton of the density terrain of grid points. The main advantage of this is to obtain an estimated road with some degree of confidence based on the distribution of trajectories over a grid region. This identification of the most confident estimations is an effective way to use the high amount of overlapping trajectory data to create an estimation of the underlying road network that resembles a  mode average of the overlapped trajectories, which smooths out some of the noise introduced by so many different trajectories. The purpose of persistence as applied in the algorithm is to further identify the features in the estimated road network that are the most 'true'. Given the degree of confidence as calculated by the density function, this step filters out the estimated roads that may not be as accurate as those which are associated with higher confidence scores.  %The other is to detect the roads with high density.  %The  purpose of persistence is to measure  the scale or
+%resolution of a topological feature, in this project, we use the persistence to measure the importance of curves (whose projections are roads of the map), we remove the unimportant roads whose persistence is less or equal than a given value, which make the map much clear after simplification.    
+
+
+
+
+There are several aspects that can be improved in this project in the future. First, the final visualization of the map can be improved by using plug-in components of Java \begin{comment}This seems out of place/doesn't quite make any sense \end{comment}. For this project, we generated the map using java code that did not define the estimated road as a vector map. This presented an issue with being able to utilize an open source package from the maps  portal to compare our generated map with the ground truth map. By redefining the representation of the road network, we can more easily examine the accuracy of our implementation of map reconstruction.% What is more, we can compare the map we got with the ground truth map in the future. 
+Additionally, persistent homology is not the only factor in determining the accuracy of a particular road; we can combine the other features such as the length of road with the density of road, which was seen to improve the accuracy of the map after simplification in \textit{et al.}.
+It would also be interesting to explore how to support more functionalities
+based on the current framework, such as returning a potential
+path for an input query region.
+
+
+
+
+
+\bibliography{references}{}
+\bibliographystyle{plain}
+\end{document}
